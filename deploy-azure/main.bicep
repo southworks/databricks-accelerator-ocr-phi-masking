@@ -1,6 +1,6 @@
 param databricksResourceName string = 'pandora-dbw'
 
-var deploymentId = guid(deployment().name)
+var deploymentId = guid(resourceGroup().id)
 var deploymentIdShort = substring(deploymentId, 0, 8)
 
 var acceleratorRepoName = 'anti-money-laundering'

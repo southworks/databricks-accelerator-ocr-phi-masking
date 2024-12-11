@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.32.4.45862",
-      "templateHash": "6383939983371603890"
+      "templateHash": "11372555774849103735"
     }
   },
   "parameters": {
@@ -15,7 +15,7 @@
     }
   },
   "variables": {
-    "deploymentId": "[guid(deployment().name)]",
+    "deploymentId": "[guid(resourceGroup().id)]",
     "deploymentIdShort": "[substring(variables('deploymentId'), 0, 8)]",
     "acceleratorRepoName": "anti-money-laundering"
   },
