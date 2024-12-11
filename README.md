@@ -51,4 +51,4 @@ Once the JSL installation completes successfully, clone this repo into a Databri
 
 ---
 
-[Deploy to azure] (https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fsouthworks%2Focr-phi-masking%2Fblob%2F40ce0707623dae8071540be8dfc5ad643e304cbc%2Fdeploy-azure%2Fmain.json)
+[Deploy to azure](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fsouthworks%2Focr-phi-masking%2Fblob%2F40ce0707623dae8071540be8dfc5ad643e304cbc%2Fdeploy-azure%2Fmain.json)
