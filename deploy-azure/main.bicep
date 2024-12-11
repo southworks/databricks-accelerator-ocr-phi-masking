@@ -22,7 +22,7 @@ resource databricksRoleAssignment 'Microsoft.Authorization/roleAssignments@2022-
   name: guid(managedIdentity.id, contributorRole.id)
   properties: {
     roleDefinitionId: contributorRole.id
-    principalId: managedIdentity.id
+    principalId: managedIdentity.properties.principalId
     principalType: 'ServicePrincipal'
   }
 }
