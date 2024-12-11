@@ -14,17 +14,16 @@ resource databricks 'Microsoft.Databricks/workspaces@2024-09-01-preview' existin
   name: databricksResourceName
 }
 
-resource contributorRole 'Microsoft.Authorization/roleDefinitions@2022-05-01-preview' existing = {
-  name: 'Contributor'
-}
-
 resource databricksRoleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
-  name: guid(managedIdentity.id, contributorRole.id)
+  name: guid(managedIdentity.id, 'Contributor')
   scope: databricks
   properties: {
-    roleDefinitionId: contributorRole.id
+    roleDefinitionId: subscriptionResourceId(
+      'Microsoft.Authorization/roleDefinitions',
+      'b24988ac-6180-42a0-ab88-20f7382dd24c'
+    )
     principalId: managedIdentity.properties.principalId
-    principalType: 'MSI'
+    // principalType: 'ServicePrincipal'
   }
 }
 
@@ -36,7 +35,6 @@ resource deploymentScript 'Microsoft.Resources/deploymentScripts@2023-08-01' = {
     azCliVersion: '2.9.1'
     scriptContent: '''
       cd ~
-      tdnf install -yq unzip
       curl -fsSL https://raw.githubusercontent.com/databricks/setup-cli/main/install.sh | sh
       databricks repos create https://github.com/southworks/${ACCELERATOR_REPO_NAME} gitHub
       databricks workspace export /Users/${ARM_CLIENT_ID}/${ACCELERATOR_REPO_NAME}/deploy-azure/job-template.json > job-template.json

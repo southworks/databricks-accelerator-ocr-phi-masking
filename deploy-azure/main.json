@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.32.4.45862",
-      "templateHash": "6532242308533751766"
+      "templateHash": "995456307900810355"
     }
   },
   "parameters": {
@@ -30,11 +30,10 @@
       "type": "Microsoft.Authorization/roleAssignments",
       "apiVersion": "2022-04-01",
       "scope": "[format('Microsoft.Databricks/workspaces/{0}', parameters('databricksResourceName'))]",
-      "name": "[guid(resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', format('dbw-id-{0}', variables('deploymentIdShort'))), resourceId('Microsoft.Authorization/roleDefinitions', 'Contributor'))]",
+      "name": "[guid(resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', format('dbw-id-{0}', variables('deploymentIdShort'))), 'Contributor')]",
       "properties": {
-        "roleDefinitionId": "[resourceId('Microsoft.Authorization/roleDefinitions', 'Contributor')]",
-        "principalId": "[reference(resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', format('dbw-id-{0}', variables('deploymentIdShort'))), '2023-07-31-preview').principalId]",
-        "principalType": "MSI"
+        "roleDefinitionId": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', 'b24988ac-6180-42a0-ab88-20f7382dd24c')]",
+        "principalId": "[reference(resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', format('dbw-id-{0}', variables('deploymentIdShort'))), '2023-07-31-preview').principalId]"
       },
       "dependsOn": [
         "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', format('dbw-id-{0}', variables('deploymentIdShort')))]"
@@ -48,7 +47,7 @@
       "kind": "AzureCLI",
       "properties": {
         "azCliVersion": "2.9.1",
-        "scriptContent": "      cd ~\n      tdnf install -yq unzip\n      curl -fsSL https://raw.githubusercontent.com/databricks/setup-cli/main/install.sh | sh\n      databricks repos create https://github.com/southworks/${ACCELERATOR_REPO_NAME} gitHub\n      databricks workspace export /Users/${ARM_CLIENT_ID}/${ACCELERATOR_REPO_NAME}/deploy-azure/job-template.json > job-template.json\n      sed \"s/<username>/${ARM_CLIENT_ID}/g\" job-template.json > job.json\n      databricks jobs submit --json @./job.json\n    ",
+        "scriptContent": "      cd ~\n      curl -fsSL https://raw.githubusercontent.com/databricks/setup-cli/main/install.sh | sh\n      databricks repos create https://github.com/southworks/${ACCELERATOR_REPO_NAME} gitHub\n      databricks workspace export /Users/${ARM_CLIENT_ID}/${ACCELERATOR_REPO_NAME}/deploy-azure/job-template.json > job-template.json\n      sed \"s/<username>/${ARM_CLIENT_ID}/g\" job-template.json > job.json\n      databricks jobs submit --json @./job.json\n    ",
         "environmentVariables": [
           {
             "name": "DATABRICKS_AZURE_RESOURCE_ID",
@@ -78,7 +77,7 @@
         }
       },
       "dependsOn": [
-        "[extensionResourceId(resourceId('Microsoft.Databricks/workspaces', parameters('databricksResourceName')), 'Microsoft.Authorization/roleAssignments', guid(resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', format('dbw-id-{0}', variables('deploymentIdShort'))), resourceId('Microsoft.Authorization/roleDefinitions', 'Contributor')))]",
+        "[extensionResourceId(resourceId('Microsoft.Databricks/workspaces', parameters('databricksResourceName')), 'Microsoft.Authorization/roleAssignments', guid(resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', format('dbw-id-{0}', variables('deploymentIdShort'))), 'Contributor'))]",
         "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', format('dbw-id-{0}', variables('deploymentIdShort')))]"
       ]
     }
