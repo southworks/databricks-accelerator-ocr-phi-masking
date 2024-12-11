@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.32.4.45862",
-      "templateHash": "18196586512227349107"
+      "templateHash": "13060985041947968585"
     }
   },
   "parameters": {
@@ -77,6 +77,7 @@
         }
       },
       "dependsOn": [
+        "[resourceId('Microsoft.Authorization/roleAssignments', guid(resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', format('dbw-id-{0}', variables('deploymentIdShort'))), resourceId('Microsoft.Authorization/roleDefinitions', 'Contributor')))]",
         "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', format('dbw-id-{0}', variables('deploymentIdShort')))]"
       ]
     }

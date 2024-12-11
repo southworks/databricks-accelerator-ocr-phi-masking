@@ -70,4 +70,7 @@ resource deploymentScript 'Microsoft.Resources/deploymentScripts@2023-08-01' = {
       '${managedIdentity.id}': {}
     }
   }
+  dependsOn: [
+    databricksRoleAssignment
+  ]
 }
