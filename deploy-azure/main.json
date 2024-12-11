@@ -5,18 +5,19 @@
     "_generator": {
       "name": "bicep",
       "version": "0.32.4.45862",
-      "templateHash": "14358753290932336529"
+      "templateHash": "6383939983371603890"
     }
   },
   "parameters": {
     "databricksResourceName": {
-      "type": "string"
+      "type": "string",
+      "defaultValue": "pandora-dbw"
     }
   },
   "variables": {
     "deploymentId": "[guid(deployment().name)]",
     "deploymentIdShort": "[substring(variables('deploymentId'), 0, 8)]",
-    "acceleratorName": "anti-money-laundering"
+    "acceleratorRepoName": "anti-money-laundering"
   },
   "resources": [
     {
@@ -45,8 +46,8 @@
       "location": "[resourceGroup().location]",
       "kind": "AzureCLI",
       "properties": {
-        "azCliVersion": "azurelinux3.0",
-        "scriptContent": "      cd ~\n      tdnf install -yq unzip\n      curl -fsSL https://raw.githubusercontent.com/databricks/setup-cli/main/install.sh | sh\n      databricks repos create https://github.com/southworks/${ACCELERATOR_NAME} gitHub\n      databricks workspace export /Users/${ARM_CLIENT_ID}/${ACCELERATOR_NAME}/deploy-azure/job-template.json > job-template.json\n      sed \"s/<username>/${ARM_CLIENT_ID}/g\" job-template.json > job.json\n      databricks jobs submit --json @./job.json\n    ",
+        "azCliVersion": "2.9.1",
+        "scriptContent": "      cd ~\n      tdnf install -yq unzip\n      curl -fsSL https://raw.githubusercontent.com/databricks/setup-cli/main/install.sh | sh\n      databricks repos create https://github.com/southworks/${ACCELERATOR_REPO_NAME} gitHub\n      databricks workspace export /Users/${ARM_CLIENT_ID}/${ACCELERATOR_REPO_NAME}/deploy-azure/job-template.json > job-template.json\n      sed \"s/<username>/${ARM_CLIENT_ID}/g\" job-template.json > job.json\n      databricks jobs submit --json @./job.json\n    ",
         "environmentVariables": [
           {
             "name": "DATABRICKS_AZURE_RESOURCE_ID",
@@ -61,8 +62,8 @@
             "value": "true"
           },
           {
-            "name": "ACCELERATOR_NAME",
-            "value": "[variables('acceleratorName')]"
+            "name": "ACCELERATOR_REPO_NAME",
+            "value": "[variables('acceleratorRepoName')]"
           }
         ],
         "timeout": "PT20M",

@@ -1,4 +1,4 @@
-param databricksResourceName string
+param databricksResourceName string = 'pandora-dbw'
 
 var deploymentId = guid(deployment().name)
 var deploymentIdShort = substring(deploymentId, 0, 8)
@@ -12,7 +12,6 @@ resource managedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-
 
 resource databricks 'Microsoft.Databricks/workspaces@2024-09-01-preview' existing = {
   name: databricksResourceName
-  scope: resourceGroup()
 }
 
 resource contributorRole 'Microsoft.Authorization/roleDefinitions@2022-05-01-preview' existing = {
