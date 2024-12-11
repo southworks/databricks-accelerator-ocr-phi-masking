@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.32.4.45862",
-      "templateHash": "13103892952566428740"
+      "templateHash": "6532242308533751766"
     }
   },
   "parameters": {
@@ -34,7 +34,7 @@
       "properties": {
         "roleDefinitionId": "[resourceId('Microsoft.Authorization/roleDefinitions', 'Contributor')]",
         "principalId": "[reference(resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', format('dbw-id-{0}', variables('deploymentIdShort'))), '2023-07-31-preview').principalId]",
-        "principalType": "ServicePrincipal"
+        "principalType": "MSI"
       },
       "dependsOn": [
         "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', format('dbw-id-{0}', variables('deploymentIdShort')))]"

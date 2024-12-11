@@ -24,7 +24,7 @@ resource databricksRoleAssignment 'Microsoft.Authorization/roleAssignments@2022-
   properties: {
     roleDefinitionId: contributorRole.id
     principalId: managedIdentity.properties.principalId
-    principalType: 'ServicePrincipal'
+    principalType: 'MSI'
   }
 }
 
