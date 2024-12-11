@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.32.4.45862",
-      "templateHash": "995456307900810355"
+      "templateHash": "17478886764111434796"
     }
   },
   "parameters": {
@@ -47,7 +47,7 @@
       "kind": "AzureCLI",
       "properties": {
         "azCliVersion": "2.9.1",
-        "scriptContent": "      cd ~\n      curl -fsSL https://raw.githubusercontent.com/databricks/setup-cli/main/install.sh | sh\n      databricks repos create https://github.com/southworks/${ACCELERATOR_REPO_NAME} gitHub\n      databricks workspace export /Users/${ARM_CLIENT_ID}/${ACCELERATOR_REPO_NAME}/deploy-azure/job-template.json > job-template.json\n      sed \"s/<username>/${ARM_CLIENT_ID}/g\" job-template.json > job.json\n      databricks jobs submit --json @./job.json\n    ",
+        "scriptContent": "      cd ~\n      curl -fsSL https://raw.githubusercontent.com/databricks/setup-cli/main/install.sh | sh\n      databricks repos create https://github.com/southworks/${ACCELERATOR_REPO_NAME} gitHub\n      databricks workspace export /Users/${ARM_CLIENT_ID}/${ACCELERATOR_REPO_NAME}/deploy-azure/job-template.json > job-template.json\n      notebook_path=\"/Users/${ARM_CLIENT_ID}/${ACCELERATOR_REPO_NAME}/RUNME\"\n      jq \".tasks[0].notebook_task.notebook_path = \\\"${notebook_path}\\\"\" job-template.json > job.json\n      databricks jobs submit --json @./job.json\n    ",
         "environmentVariables": [
           {
             "name": "DATABRICKS_AZURE_RESOURCE_ID",
