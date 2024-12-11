@@ -38,7 +38,8 @@ resource deploymentScript 'Microsoft.Resources/deploymentScripts@2023-08-01' = {
       curl -fsSL https://raw.githubusercontent.com/databricks/setup-cli/main/install.sh | sh
       databricks repos create https://github.com/southworks/${ACCELERATOR_REPO_NAME} gitHub
       databricks workspace export /Users/${ARM_CLIENT_ID}/${ACCELERATOR_REPO_NAME}/deploy-azure/job-template.json > job-template.json
-      sed "s/<username>/${ARM_CLIENT_ID}/g" job-template.json > job.json
+      notebook_path="/Users/${ARM_CLIENT_ID}/${ACCELERATOR_REPO_NAME}/RUNME"
+      jq ".tasks[0].notebook_task.notebook_path = \"${notebook_path}\"" job-template.json > job.json
       databricks jobs submit --json @./job.json
     '''
     environmentVariables: [

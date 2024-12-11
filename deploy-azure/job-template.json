@@ -15,7 +15,7 @@
       "task_key": "Match",
       "description": "Matches orders with user sessions",
       "notebook_task": {
-        "notebook_path": "/Users/<username>/anti-money-laundering/RUNME"
+        "notebook_path": "<replace-path-here>"
       },
       "new_cluster": {
         "num_workers": 1,
