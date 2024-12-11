@@ -3,7 +3,7 @@ param databricksResourceName string = 'pandora-dbw'
 var deploymentId = guid(resourceGroup().id)
 var deploymentIdShort = substring(deploymentId, 0, 8)
 
-var acceleratorRepoName = 'anti-money-laundering'
+var acceleratorRepoName = 'databricks-accelerator-ocr-phi-masking'
 
 resource managedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-07-31-preview' = {
   name: 'dbw-id-${deploymentIdShort}'
