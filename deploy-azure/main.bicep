@@ -20,6 +20,7 @@ resource contributorRole 'Microsoft.Authorization/roleDefinitions@2022-05-01-pre
 
 resource databricksRoleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
   name: guid(managedIdentity.id, contributorRole.id)
+  scope: databricks
   properties: {
     roleDefinitionId: contributorRole.id
     principalId: managedIdentity.properties.principalId

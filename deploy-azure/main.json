@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.32.4.45862",
-      "templateHash": "13374162801628201470"
+      "templateHash": "13103892952566428740"
     }
   },
   "parameters": {
@@ -29,6 +29,7 @@
     {
       "type": "Microsoft.Authorization/roleAssignments",
       "apiVersion": "2022-04-01",
+      "scope": "[format('Microsoft.Databricks/workspaces/{0}', parameters('databricksResourceName'))]",
       "name": "[guid(resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', format('dbw-id-{0}', variables('deploymentIdShort'))), resourceId('Microsoft.Authorization/roleDefinitions', 'Contributor'))]",
       "properties": {
         "roleDefinitionId": "[resourceId('Microsoft.Authorization/roleDefinitions', 'Contributor')]",
@@ -77,7 +78,7 @@
         }
       },
       "dependsOn": [
-        "[resourceId('Microsoft.Authorization/roleAssignments', guid(resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', format('dbw-id-{0}', variables('deploymentIdShort'))), resourceId('Microsoft.Authorization/roleDefinitions', 'Contributor')))]",
+        "[extensionResourceId(resourceId('Microsoft.Databricks/workspaces', parameters('databricksResourceName')), 'Microsoft.Authorization/roleAssignments', guid(resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', format('dbw-id-{0}', variables('deploymentIdShort'))), resourceId('Microsoft.Authorization/roleDefinitions', 'Contributor')))]",
         "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', format('dbw-id-{0}', variables('deploymentIdShort')))]"
       ]
     }
