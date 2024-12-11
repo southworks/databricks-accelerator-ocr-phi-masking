@@ -3,7 +3,7 @@ param databricksResourceName string
 var deploymentId = guid(deployment().name)
 var deploymentIdShort = substring(deploymentId, 0, 8)
 
-var acceleratorName = 'anti-money-laundering'
+var acceleratorRepoName = 'anti-money-laundering'
 
 resource managedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-07-31-preview' = {
   name: 'dbw-id-${deploymentIdShort}'
@@ -37,8 +37,8 @@ resource deploymentScript 'Microsoft.Resources/deploymentScripts@2023-08-01' = {
       cd ~
       tdnf install -yq unzip
       curl -fsSL https://raw.githubusercontent.com/databricks/setup-cli/main/install.sh | sh
-      databricks repos create https://github.com/southworks/${ACCELERATOR_NAME} gitHub
-      databricks workspace export /Users/${ARM_CLIENT_ID}/${ACCELERATOR_NAME}/deploy-azure/job-template.json > job-template.json
+      databricks repos create https://github.com/southworks/${ACCELERATOR_REPO_NAME} gitHub
+      databricks workspace export /Users/${ARM_CLIENT_ID}/${ACCELERATOR_REPO_NAME}/deploy-azure/job-template.json > job-template.json
       sed "s/<username>/${ARM_CLIENT_ID}/g" job-template.json > job.json
       databricks jobs submit --json @./job.json
     '''
@@ -56,8 +56,8 @@ resource deploymentScript 'Microsoft.Resources/deploymentScripts@2023-08-01' = {
         value: 'true'
       }
       {
-        name: 'ACCELERATOR_NAME'
-        value: acceleratorName
+        name: 'ACCELERATOR_REPO_NAME'
+        value: acceleratorRepoName
       }
     ]
     timeout: 'PT20M'
