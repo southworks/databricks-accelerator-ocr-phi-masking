@@ -12,6 +12,7 @@ resource managedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-
 
 resource databricks 'Microsoft.Databricks/workspaces@2024-09-01-preview' existing = {
   name: databricksResourceName
+  scope: resourceGroup()
 }
 
 resource contributorRole 'Microsoft.Authorization/roleDefinitions@2022-05-01-preview' existing = {
@@ -32,7 +33,7 @@ resource deploymentScript 'Microsoft.Resources/deploymentScripts@2023-08-01' = {
   location: resourceGroup().location
   kind: 'AzureCLI'
   properties: {
-    azCliVersion: 'azurelinux3.0'
+    azCliVersion: '2.9.1'
     scriptContent: '''
       cd ~
       tdnf install -yq unzip
