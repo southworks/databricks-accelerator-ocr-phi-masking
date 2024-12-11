@@ -49,7 +49,7 @@ resource deploymentScript 'Microsoft.Resources/deploymentScripts@2023-08-01' = {
       }
       {
         name: 'ARM_CLIENT_ID'
-        secureValue: managedIdentity.properties.clientId
+        value: managedIdentity.properties.clientId
       }
       {
         name: 'ARM_USE_MSI'

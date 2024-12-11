@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.32.4.45862",
-      "templateHash": "17478886764111434796"
+      "templateHash": "11847577047002104842"
     }
   },
   "parameters": {
@@ -55,7 +55,7 @@
           },
           {
             "name": "ARM_CLIENT_ID",
-            "secureValue": "[reference(resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', format('dbw-id-{0}', variables('deploymentIdShort'))), '2023-07-31-preview').clientId]"
+            "value": "[reference(resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', format('dbw-id-{0}', variables('deploymentIdShort'))), '2023-07-31-preview').clientId]"
           },
           {
             "name": "ARM_USE_MSI",
