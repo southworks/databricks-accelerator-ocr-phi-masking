@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.32.4.45862",
-      "templateHash": "11372555774849103735"
+      "templateHash": "18196586512227349107"
     }
   },
   "parameters": {
@@ -17,7 +17,7 @@
   "variables": {
     "deploymentId": "[guid(resourceGroup().id)]",
     "deploymentIdShort": "[substring(variables('deploymentId'), 0, 8)]",
-    "acceleratorRepoName": "anti-money-laundering"
+    "acceleratorRepoName": "databricks-accelerator-ocr-phi-masking"
   },
   "resources": [
     {
