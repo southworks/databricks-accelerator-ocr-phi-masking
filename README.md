@@ -51,6 +51,4 @@ Once the JSL installation completes successfully, clone this repo into a Databri
 
 ---
 
-[Deploy to azure](https://portal.azure.com/#create/Microsoft.Template/uri/https%253A%252F%252Fgithub.com%252Fsouthworks%252Fdatabricks-accelerator-ocr-phi-masking%252Fblob%252Fexisting-db-instance%252Fdeploy-azure%252Fmain.json)
-
-https://github.com/southworks/databricks-accelerator-ocr-phi-masking/blob/existing-db-instance/deploy-azure/main.json
+[Deploy to azure](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fsouthworks%2Fdatabricks-accelerator-ocr-phi-masking%2Frefs%2Fheads%2Fexisting-db-instance%2Fdeploy-azure%2Fmain.json)
