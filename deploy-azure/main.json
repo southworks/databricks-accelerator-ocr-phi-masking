@@ -4,20 +4,51 @@
   "metadata": {
     "_generator": {
       "name": "bicep",
-      "version": "0.32.4.45862",
-      "templateHash": "11847577047002104842"
+      "version": "0.33.93.31351",
+      "templateHash": "13747037542497762522"
     }
   },
   "parameters": {
+    "newOrExisting": {
+      "type": "string",
+      "defaultValue": "new",
+      "allowedValues": [
+        "new",
+        "existing"
+      ]
+    },
     "databricksResourceName": {
       "type": "string",
-      "defaultValue": "pandora-dbw"
+      "metadata": {
+        "description": "The name of the Azure Databricks workspace to create."
+      }
+    },
+    "disablePublicIp": {
+      "type": "bool",
+      "defaultValue": false,
+      "metadata": {
+        "description": "Specifies whether to deploy Azure Databricks workspace with Secure Cluster Connectivity (No Public IP) enabled or not"
+      }
+    },
+    "sku": {
+      "type": "string",
+      "defaultValue": "standard",
+      "allowedValues": [
+        "standard",
+        "premium"
+      ],
+      "metadata": {
+        "description": "The pricing tier of workspace."
+      }
     }
   },
   "variables": {
     "deploymentId": "[guid(resourceGroup().id)]",
     "deploymentIdShort": "[substring(variables('deploymentId'), 0, 8)]",
-    "acceleratorRepoName": "databricks-accelerator-ocr-phi-masking"
+    "acceleratorRepoName": "databricks-accelerator-ocr-phi-masking",
+    "managedResourceGroupName": "[format('databricks-rg-{0}-{1}', parameters('databricksResourceName'), uniqueString(parameters('databricksResourceName'), resourceGroup().id))]",
+    "trimmedMRGName": "[substring(variables('managedResourceGroupName'), 0, min(length(variables('managedResourceGroupName')), 90))]",
+    "managedResourceGroupId": "[resourceId('Microsoft.Resources/resourceGroups', variables('trimmedMRGName'))]"
   },
   "resources": [
     {
@@ -25,6 +56,24 @@
       "apiVersion": "2023-07-31-preview",
       "name": "[format('dbw-id-{0}', variables('deploymentIdShort'))]",
       "location": "[resourceGroup().location]"
+    },
+    {
+      "condition": "[equals(parameters('newOrExisting'), 'new')]",
+      "type": "Microsoft.Databricks/workspaces",
+      "apiVersion": "2024-09-01-preview",
+      "name": "[parameters('databricksResourceName')]",
+      "location": "[resourceGroup().location]",
+      "sku": {
+        "name": "[parameters('sku')]"
+      },
+      "properties": {
+        "managedResourceGroupId": "[variables('managedResourceGroupId')]",
+        "parameters": {
+          "enableNoPublicIp": {
+            "value": "[parameters('disablePublicIp')]"
+          }
+        }
+      }
     },
     {
       "type": "Microsoft.Authorization/roleAssignments",
@@ -47,7 +96,7 @@
       "kind": "AzureCLI",
       "properties": {
         "azCliVersion": "2.9.1",
-        "scriptContent": "      cd ~\n      curl -fsSL https://raw.githubusercontent.com/databricks/setup-cli/main/install.sh | sh\n      databricks repos create https://github.com/southworks/${ACCELERATOR_REPO_NAME} gitHub\n      databricks workspace export /Users/${ARM_CLIENT_ID}/${ACCELERATOR_REPO_NAME}/deploy-azure/job-template.json > job-template.json\n      notebook_path=\"/Users/${ARM_CLIENT_ID}/${ACCELERATOR_REPO_NAME}/RUNME\"\n      jq \".tasks[0].notebook_task.notebook_path = \\\"${notebook_path}\\\"\" job-template.json > job.json\n      databricks jobs submit --json @./job.json\n    ",
+        "scriptContent": "      cd ~\r\n      curl -fsSL https://raw.githubusercontent.com/databricks/setup-cli/main/install.sh | sh\r\n      databricks repos create https://github.com/southworks/${ACCELERATOR_REPO_NAME} gitHub\r\n      databricks workspace export /Users/${ARM_CLIENT_ID}/${ACCELERATOR_REPO_NAME}/deploy-azure/job-template.json > job-template.json\r\n      notebook_path=\"/Users/${ARM_CLIENT_ID}/${ACCELERATOR_REPO_NAME}/RUNME\"\r\n      jq \".tasks[0].notebook_task.notebook_path = \\\"${notebook_path}\\\"\" job-template.json > job.json\r\n      databricks jobs submit --json @./job.json\r\n    ",
         "environmentVariables": [
           {
             "name": "DATABRICKS_AZURE_RESOURCE_ID",
