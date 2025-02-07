@@ -5,11 +5,11 @@
     "_generator": {
       "name": "bicep",
       "version": "0.33.93.31351",
-      "templateHash": "13747037542497762522"
+      "templateHash": "16226832315712214981"
     }
   },
   "parameters": {
-    "newOrExisting": {
+    "newOrExistingWorkspace": {
       "type": "string",
       "defaultValue": "new",
       "allowedValues": [
@@ -48,7 +48,7 @@
     "acceleratorRepoName": "databricks-accelerator-ocr-phi-masking",
     "managedResourceGroupName": "[format('databricks-rg-{0}-{1}', parameters('databricksResourceName'), uniqueString(parameters('databricksResourceName'), resourceGroup().id))]",
     "trimmedMRGName": "[substring(variables('managedResourceGroupName'), 0, min(length(variables('managedResourceGroupName')), 90))]",
-    "managedResourceGroupId": "[resourceId('Microsoft.Resources/resourceGroups', variables('trimmedMRGName'))]"
+    "managedResourceGroupId": "[subscriptionResourceId('Microsoft.Resources/resourceGroups', variables('trimmedMRGName'))]"
   },
   "resources": [
     {
@@ -58,7 +58,7 @@
       "location": "[resourceGroup().location]"
     },
     {
-      "condition": "[equals(parameters('newOrExisting'), 'new')]",
+      "condition": "[equals(parameters('newOrExistingWorkspace'), 'new')]",
       "type": "Microsoft.Databricks/workspaces",
       "apiVersion": "2024-09-01-preview",
       "name": "[parameters('databricksResourceName')]",

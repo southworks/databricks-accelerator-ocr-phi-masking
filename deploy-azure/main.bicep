@@ -2,7 +2,7 @@
   'new'
   'existing'
 ])
-param newOrExisting string = 'new'
+param newOrExistingWorkspace string = 'new'
 
 @description('The name of the Azure Databricks workspace to create.')
 param databricksResourceName string
@@ -22,14 +22,14 @@ var deploymentIdShort = substring(deploymentId, 0, 8)
 var acceleratorRepoName = 'databricks-accelerator-ocr-phi-masking'
 var managedResourceGroupName = 'databricks-rg-${databricksResourceName}-${uniqueString(databricksResourceName, resourceGroup().id)}'
 var trimmedMRGName = substring(managedResourceGroupName, 0, min(length(managedResourceGroupName), 90))
-var managedResourceGroupId = resourceId('Microsoft.Resources/resourceGroups', trimmedMRGName)
+var managedResourceGroupId = subscriptionResourceId('Microsoft.Resources/resourceGroups', trimmedMRGName)
 
 resource managedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-07-31-preview' = {
   name: 'dbw-id-${deploymentIdShort}'
   location: resourceGroup().location
 }
 
-resource newDatabricks 'Microsoft.Databricks/workspaces@2024-09-01-preview' = if (newOrExisting == 'new') {
+resource newDatabricks 'Microsoft.Databricks/workspaces@2024-09-01-preview' = if (newOrExistingWorkspace == 'new') {
   name: databricksResourceName
   location: resourceGroup().location
   sku: {
