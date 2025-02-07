@@ -1,16 +1,51 @@
-param databricksResourceName string = 'pandora-dbw'
+@allowed([
+  'new'
+  'existing'
+])
+param newOrExisting string = 'new'
+
+@description('The name of the Azure Databricks workspace to create.')
+param databricksResourceName string
+
+@description('Specifies whether to deploy Azure Databricks workspace with Secure Cluster Connectivity (No Public IP) enabled or not')
+param disablePublicIp bool = false
+
+@description('The pricing tier of workspace.')
+@allowed([
+  'standard'
+  'premium'
+])
+param sku string = 'standard'
 
 var deploymentId = guid(resourceGroup().id)
 var deploymentIdShort = substring(deploymentId, 0, 8)
-
 var acceleratorRepoName = 'databricks-accelerator-ocr-phi-masking'
+var managedResourceGroupName = 'databricks-rg-${databricksResourceName}-${uniqueString(databricksResourceName, resourceGroup().id)}'
+var trimmedMRGName = substring(managedResourceGroupName, 0, min(length(managedResourceGroupName), 90))
+var managedResourceGroupId = resourceId('Microsoft.Resources/resourceGroups', trimmedMRGName)
 
 resource managedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-07-31-preview' = {
   name: 'dbw-id-${deploymentIdShort}'
   location: resourceGroup().location
 }
 
-resource databricks 'Microsoft.Databricks/workspaces@2024-09-01-preview' existing = {
+resource newDatabricks 'Microsoft.Databricks/workspaces@2024-09-01-preview' = if (newOrExisting == 'new') {
+  name: databricksResourceName
+  location: resourceGroup().location
+  sku: {
+    name: sku
+  }
+  properties: {
+    managedResourceGroupId: managedResourceGroupId
+    parameters: {
+      enableNoPublicIp: {
+        value: disablePublicIp
+      }
+    }
+  }
+}
+
+resource databricks 'Microsoft.Databricks/workspaces@2024-09-01-preview' existing =  {
   name: databricksResourceName
 }
 
