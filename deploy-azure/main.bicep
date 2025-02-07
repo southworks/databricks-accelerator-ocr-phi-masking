@@ -60,8 +60,8 @@ resource databricksRoleAssignment 'Microsoft.Authorization/roleAssignments@2022-
       'b24988ac-6180-42a0-ab88-20f7382dd24c'
     )
     principalId: managedIdentity.properties.principalId
-    // principalType: 'ServicePrincipal'
   }
+  dependsOn: newOrExistingWorkspace == 'new' ? [newDatabricks] : [databricks]
 }
 
 resource deploymentScript 'Microsoft.Resources/deploymentScripts@2023-08-01' = {

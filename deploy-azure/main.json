@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.33.93.31351",
-      "templateHash": "3294209284414411016"
+      "templateHash": "12204159243110736329"
     }
   },
   "parameters": {
@@ -85,7 +85,8 @@
         "principalId": "[reference(resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', format('dbw-id-{0}', variables('deploymentIdShort'))), '2023-07-31-preview').principalId]"
       },
       "dependsOn": [
-        "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', format('dbw-id-{0}', variables('deploymentIdShort')))]"
+        "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', format('dbw-id-{0}', variables('deploymentIdShort')))]",
+        "[resourceId('Microsoft.Databricks/workspaces', parameters('databricksResourceName'))]"
       ]
     },
     {
