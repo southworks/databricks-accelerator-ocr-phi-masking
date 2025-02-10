@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.33.93.31351",
-      "templateHash": "17436442379143128193"
+      "templateHash": "17611135649429580568"
     }
   },
   "parameters": {
@@ -82,7 +82,8 @@
       "name": "[guid(resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', format('dbw-id-{0}', variables('deploymentIdShort'))), 'Contributor')]",
       "properties": {
         "roleDefinitionId": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', 'b24988ac-6180-42a0-ab88-20f7382dd24c')]",
-        "principalId": "[reference(resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', format('dbw-id-{0}', variables('deploymentIdShort'))), '2023-07-31-preview').principalId]"
+        "principalId": "[reference(resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', format('dbw-id-{0}', variables('deploymentIdShort'))), '2023-07-31-preview').principalId]",
+        "principalType": "ServicePrincipal"
       },
       "dependsOn": [
         "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', format('dbw-id-{0}', variables('deploymentIdShort')))]",
