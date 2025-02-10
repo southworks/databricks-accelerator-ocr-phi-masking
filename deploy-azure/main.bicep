@@ -51,7 +51,7 @@ resource databricks 'Microsoft.Databricks/workspaces@2024-09-01-preview' existin
 }
 
 resource databricksRoleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
-  name: guid(managedIdentity.id, 'Contributor')
+  name: guid(managedIdentity.id, 'Contributor', databricks.id)
   scope: databricks
   properties: {
     roleDefinitionId: subscriptionResourceId(
