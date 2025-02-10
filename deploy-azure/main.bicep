@@ -22,8 +22,6 @@ var deploymentIdShort = substring(deploymentId, 0, 8)
 var acceleratorRepoName = 'databricks-accelerator-ocr-phi-masking'
 var managedResourceGroupName = 'databricks-rg-${databricksResourceName}-${uniqueString(databricksResourceName, resourceGroup().id)}'
 var trimmedMRGName = substring(managedResourceGroupName, 0, min(length(managedResourceGroupName), 90))
-
-// Use subscriptionResourceId for a correct ID
 var managedResourceGroupId = subscriptionResourceId('Microsoft.Resources/resourceGroups', trimmedMRGName)
 
 resource managedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-07-31-preview' = {
@@ -49,6 +47,7 @@ resource newDatabricks 'Microsoft.Databricks/workspaces@2024-05-01' = if (newOrE
 
 resource databricks 'Microsoft.Databricks/workspaces@2024-09-01-preview' existing =  {
   name: databricksResourceName
+  dependsOn: newOrExistingWorkspace == 'new' ? [newDatabricks] : []
 }
 
 resource databricksRoleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
@@ -61,7 +60,6 @@ resource databricksRoleAssignment 'Microsoft.Authorization/roleAssignments@2022-
     )
     principalId: managedIdentity.properties.principalId
   }
-  dependsOn: newOrExistingWorkspace == 'new' ? [newDatabricks] : [databricks]
 }
 
 resource deploymentScript 'Microsoft.Resources/deploymentScripts@2023-08-01' = {
