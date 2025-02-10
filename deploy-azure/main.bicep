@@ -17,6 +17,10 @@ param disablePublicIp bool = false
 ])
 param sku string = 'standard'
 
+@description('The secret to be used in the notebook.')
+@secure()
+param secret string
+
 var deploymentId = guid(resourceGroup().id)
 var deploymentIdShort = substring(deploymentId, 0, 8)
 var acceleratorRepoName = 'databricks-accelerator-ocr-phi-masking'
@@ -71,6 +75,14 @@ resource deploymentScript 'Microsoft.Resources/deploymentScripts@2023-08-01' = {
     azCliVersion: '2.9.1'
     scriptContent: '''
       cd ~
+
+      # Create a secret scope
+      databricks secrets create-scope --scope my-secret-scope
+
+      # Add the secret to the scope
+      databricks secrets put --scope my-secret-scope --key my-secret-key --string-value "${SECRET}"
+
+      # Run the RUNME.py notebook
       curl -fsSL https://raw.githubusercontent.com/databricks/setup-cli/main/install.sh | sh
       databricks repos create https://github.com/southworks/${ACCELERATOR_REPO_NAME} gitHub
       databricks workspace export /Users/${ARM_CLIENT_ID}/${ACCELERATOR_REPO_NAME}/deploy-azure/job-template.json > job-template.json
@@ -95,6 +107,10 @@ resource deploymentScript 'Microsoft.Resources/deploymentScripts@2023-08-01' = {
       {
         name: 'ACCELERATOR_REPO_NAME'
         value: acceleratorRepoName
+      }
+      {
+        name: 'SECRET'
+        secureValue: secret
       }
     ]
     timeout: 'PT20M'
