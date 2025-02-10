@@ -82,6 +82,8 @@ resource deploymentScript 'Microsoft.Resources/deploymentScripts@2023-08-01' = {
       # Add the secret to the scope
       databricks secrets put --scope my-secret-scope --key my-secret-key --string-value "${SECRET}"
 
+      databricks secrets list-scopes
+
       # Run the RUNME.py notebook
       curl -fsSL https://raw.githubusercontent.com/databricks/setup-cli/main/install.sh | sh
       databricks repos create https://github.com/southworks/${ACCELERATOR_REPO_NAME} gitHub
