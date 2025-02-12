@@ -4,20 +4,57 @@
   "metadata": {
     "_generator": {
       "name": "bicep",
-      "version": "0.32.4.45862",
-      "templateHash": "11847577047002104842"
+      "version": "0.33.93.31351",
+      "templateHash": "3092294961030120330"
     }
   },
   "parameters": {
+    "newOrExistingWorkspace": {
+      "type": "string",
+      "defaultValue": "new",
+      "allowedValues": [
+        "new",
+        "existing"
+      ]
+    },
     "databricksResourceName": {
       "type": "string",
-      "defaultValue": "pandora-dbw"
+      "metadata": {
+        "description": "The name of the Azure Databricks workspace to create."
+      }
+    },
+    "disablePublicIp": {
+      "type": "bool",
+      "defaultValue": false,
+      "metadata": {
+        "description": "Specifies whether to deploy Azure Databricks workspace with Secure Cluster Connectivity (No Public IP) enabled or not"
+      }
+    },
+    "sku": {
+      "type": "string",
+      "defaultValue": "standard",
+      "allowedValues": [
+        "standard",
+        "premium"
+      ],
+      "metadata": {
+        "description": "The pricing tier of workspace."
+      }
+    },
+    "secret": {
+      "type": "securestring",
+      "metadata": {
+        "description": "The secret to be used in the notebook."
+      }
     }
   },
   "variables": {
     "deploymentId": "[guid(resourceGroup().id)]",
     "deploymentIdShort": "[substring(variables('deploymentId'), 0, 8)]",
-    "acceleratorRepoName": "databricks-accelerator-ocr-phi-masking"
+    "acceleratorRepoName": "databricks-accelerator-ocr-phi-masking",
+    "managedResourceGroupName": "[format('databricks-rg-{0}-{1}', parameters('databricksResourceName'), uniqueString(parameters('databricksResourceName'), resourceGroup().id))]",
+    "trimmedMRGName": "[substring(variables('managedResourceGroupName'), 0, min(length(variables('managedResourceGroupName')), 90))]",
+    "managedResourceGroupId": "[subscriptionResourceId('Microsoft.Resources/resourceGroups', variables('trimmedMRGName'))]"
   },
   "resources": [
     {
@@ -27,16 +64,36 @@
       "location": "[resourceGroup().location]"
     },
     {
+      "condition": "[equals(parameters('newOrExistingWorkspace'), 'new')]",
+      "type": "Microsoft.Databricks/workspaces",
+      "apiVersion": "2024-05-01",
+      "name": "[parameters('databricksResourceName')]",
+      "location": "[resourceGroup().location]",
+      "sku": {
+        "name": "[parameters('sku')]"
+      },
+      "properties": {
+        "managedResourceGroupId": "[variables('managedResourceGroupId')]",
+        "parameters": {
+          "enableNoPublicIp": {
+            "value": "[parameters('disablePublicIp')]"
+          }
+        }
+      }
+    },
+    {
       "type": "Microsoft.Authorization/roleAssignments",
       "apiVersion": "2022-04-01",
       "scope": "[format('Microsoft.Databricks/workspaces/{0}', parameters('databricksResourceName'))]",
-      "name": "[guid(resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', format('dbw-id-{0}', variables('deploymentIdShort'))), 'Contributor')]",
+      "name": "[guid(resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', format('dbw-id-{0}', variables('deploymentIdShort'))), 'Contributor', resourceId('Microsoft.Databricks/workspaces', parameters('databricksResourceName')))]",
       "properties": {
         "roleDefinitionId": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', 'b24988ac-6180-42a0-ab88-20f7382dd24c')]",
-        "principalId": "[reference(resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', format('dbw-id-{0}', variables('deploymentIdShort'))), '2023-07-31-preview').principalId]"
+        "principalId": "[reference(resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', format('dbw-id-{0}', variables('deploymentIdShort'))), '2023-07-31-preview').principalId]",
+        "principalType": "ServicePrincipal"
       },
       "dependsOn": [
-        "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', format('dbw-id-{0}', variables('deploymentIdShort')))]"
+        "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', format('dbw-id-{0}', variables('deploymentIdShort')))]",
+        "[resourceId('Microsoft.Databricks/workspaces', parameters('databricksResourceName'))]"
       ]
     },
     {
@@ -47,7 +104,7 @@
       "kind": "AzureCLI",
       "properties": {
         "azCliVersion": "2.9.1",
-        "scriptContent": "      cd ~\n      curl -fsSL https://raw.githubusercontent.com/databricks/setup-cli/main/install.sh | sh\n      databricks repos create https://github.com/southworks/${ACCELERATOR_REPO_NAME} gitHub\n      databricks workspace export /Users/${ARM_CLIENT_ID}/${ACCELERATOR_REPO_NAME}/deploy-azure/job-template.json > job-template.json\n      notebook_path=\"/Users/${ARM_CLIENT_ID}/${ACCELERATOR_REPO_NAME}/RUNME\"\n      jq \".tasks[0].notebook_task.notebook_path = \\\"${notebook_path}\\\"\" job-template.json > job.json\n      databricks jobs submit --json @./job.json\n    ",
+        "scriptContent": "      cd ~\r\n\r\n      # Create a secret scope\r\n      databricks secrets create-scope --scope my-secret-scope\r\n\r\n      # Add the secret to the scope\r\n      databricks secrets put --scope my-secret-scope --key my-secret-key --string-value \"${SECRET}\"\r\n\r\n      databricks secrets list-scopes\r\n\r\n      # Run the RUNME.py notebook\r\n      curl -fsSL https://raw.githubusercontent.com/databricks/setup-cli/main/install.sh | sh\r\n      databricks repos create https://github.com/southworks/${ACCELERATOR_REPO_NAME} gitHub\r\n      databricks workspace export /Users/${ARM_CLIENT_ID}/${ACCELERATOR_REPO_NAME}/deploy-azure/job-template.json > job-template.json\r\n      notebook_path=\"/Users/${ARM_CLIENT_ID}/${ACCELERATOR_REPO_NAME}/RUNME\"\r\n      jq \".tasks[0].notebook_task.notebook_path = \\\"${notebook_path}\\\"\" job-template.json > job.json\r\n      job_id=$(databricks jobs submit --json @./job.json | jq -r '.job_id')\r\n      echo \"{\\\"job_id\\\": \\\"$job_id\\\"}\" > $AZ_SCRIPTS_OUTPUT_PATH\r\n    ",
         "environmentVariables": [
           {
             "name": "DATABRICKS_AZURE_RESOURCE_ID",
@@ -64,6 +121,10 @@
           {
             "name": "ACCELERATOR_REPO_NAME",
             "value": "[variables('acceleratorRepoName')]"
+          },
+          {
+            "name": "SECRET",
+            "secureValue": "[parameters('secret')]"
           }
         ],
         "timeout": "PT20M",
@@ -77,9 +138,20 @@
         }
       },
       "dependsOn": [
-        "[extensionResourceId(resourceId('Microsoft.Databricks/workspaces', parameters('databricksResourceName')), 'Microsoft.Authorization/roleAssignments', guid(resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', format('dbw-id-{0}', variables('deploymentIdShort'))), 'Contributor'))]",
-        "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', format('dbw-id-{0}', variables('deploymentIdShort')))]"
+        "[extensionResourceId(resourceId('Microsoft.Databricks/workspaces', parameters('databricksResourceName')), 'Microsoft.Authorization/roleAssignments', guid(resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', format('dbw-id-{0}', variables('deploymentIdShort'))), 'Contributor', resourceId('Microsoft.Databricks/workspaces', parameters('databricksResourceName'))))]",
+        "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', format('dbw-id-{0}', variables('deploymentIdShort')))]",
+        "[resourceId('Microsoft.Databricks/workspaces', parameters('databricksResourceName'))]"
       ]
     }
-  ]
+  ],
+  "outputs": {
+    "databricksWorkspaceUrl": {
+      "type": "string",
+      "value": "[format('https://{0}', reference(resourceId('Microsoft.Databricks/workspaces', parameters('databricksResourceName')), '2024-09-01-preview').workspaceUrl)]"
+    },
+    "databricksJobUrl": {
+      "type": "string",
+      "value": "[format('https://{0}/#job/{1}', reference(resourceId('Microsoft.Databricks/workspaces', parameters('databricksResourceName')), '2024-09-01-preview').workspaceUrl, reference(resourceId('Microsoft.Resources/deploymentScripts', 'setup-databricks-script'), '2023-08-01').outputs.job_id)]"
+    }
+  }
 }
